@@ -308,7 +308,14 @@ def weather(unit='c', location_query=None, icons=None):
 	}
 	try:
 		url = 'http://query.yahooapis.com/v1/public/yql?' + urllib_urlencode(query_data)
-		response = json.loads(urllib_read(url))
+		data = urllib_read(url)
+		response = json.loads(data)
+		open('/tmp/.weather_cache', 'w').write("{0}".format(data))
+	except (KeyError, TypeError, ValueError):
+		data = open('/tmp/.weather_cache', 'r').read()
+		response = json.loads(data)
+
+	try:
 		condition = response['query']['results']['weather']['rss']['channel']['item']['condition']
 		condition_code = int(condition['code'])
 	except (KeyError, TypeError, ValueError):
@@ -327,6 +334,7 @@ def weather(unit='c', location_query=None, icons=None):
 	else:
 		icon = weather_conditions_icons[icon_names[-1]]
 
+	temperature = int(condition['temp'])
 	groups = ['weather_condition_' + icon_name for icon_name in icon_names] + ['weather_conditions', 'weather']
 	return [
 			{
@@ -335,10 +343,11 @@ def weather(unit='c', location_query=None, icons=None):
 			'divider_highlight_group': 'background:divider',
 			},
 			{
-			'contents': u'{0}°{1}'.format(condition['temp'], unit.upper()),
-			'highlight_group': ['weather_temp_cold' if int(condition['temp']) < 0 else 'weather_temp_hot', 'weather_temp', 'weather'],
+			'contents': u'{0}°{1}'.format(temperature, unit.upper()),
+			'highlight_group': ['weather_temp_cold' if temperature < 0 else 'weather_temp_hot', 'weather_temp', 'weather'],
 			'draw_divider': False,
 			'divider_highlight_group': 'background:divider',
+			'gradient_level': max(min(temperature, 100), 0),
 			},
 		]
 
