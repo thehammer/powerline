@@ -30,3 +30,6 @@ coverage.xml
 
 # SQLite databases
 *.db
+
+# Miscellaneous
+.DS_Store
