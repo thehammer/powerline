@@ -648,4 +648,22 @@ class NowPlayingSegment(object):
 			'elapsed': now_playing[3],
 			'total': now_playing[4],
 			}
+
+	def player_itunes(self):
+		if not (self._run_cmd(['uname']) == 'Darwin'):
+			return
+		if (self._run_cmd(['osascript', '-e', 'tell application "System Events" to count (every process whose name is "iTunes")']) == '0'):
+			return
+		state = self._convert_state(self._run_cmd(['osascript', '-e', 'tell application "iTunes" to player state as string']))
+		if state == 'stop':
+			return
+		return {
+			'state': state,
+			'state_symbol': self.STATE_SYMBOLS.get(state),
+			'album': self._run_cmd(['osascript', '-e', 'tell application "iTunes" to album of current track as string']),
+			'artist': self._run_cmd(['osascript', '-e', 'tell application "iTunes" to artist of current track as string']),
+			'title': self._run_cmd(['osascript', '-e', 'tell application "iTunes" to name of current track as string']),
+			'elapsed': self._convert_seconds(int(self._run_cmd(['osascript', '-e', 'tell application "iTunes" to player position as string']))),
+			'total': self._run_cmd(['osascript', '-e', 'tell application "iTunes" to time of current track as string']),
+			}
 now_playing = NowPlayingSegment()
