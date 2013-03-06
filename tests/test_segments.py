@@ -80,7 +80,7 @@ class TestCommon(TestCase):
 					{'contents': 'foo', 'divider_highlight_group': 'cwd:divider'},
 					{'contents': 'bar', 'divider_highlight_group': 'cwd:divider', 'highlight_group': ['cwd:current_folder', 'cwd']}])
 			self.assertEqual(common.cwd(dir_limit_depth=1),
-					[{'contents': '⋯', 'divider_highlight_group': 'cwd:divider'},
+					[{'contents': u'⋯', 'divider_highlight_group': 'cwd:divider'},
 					{'contents': 'bar', 'divider_highlight_group': 'cwd:divider', 'highlight_group': ['cwd:current_folder', 'cwd']}])
 			self.assertEqual(common.cwd(dir_limit_depth=2, dir_shorten_len=2),
 					[{'contents': '~', 'divider_highlight_group': 'cwd:divider'},
