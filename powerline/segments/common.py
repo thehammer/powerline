@@ -714,4 +714,26 @@ class NowPlayingSegment(object):
 			'elapsed': self._convert_seconds(int(self._run_cmd(['osascript', '-e', 'tell application "iTunes" to player position as string']))),
 			'total': self._run_cmd(['osascript', '-e', 'tell application "iTunes" to time of current track as string']),
 			}
+
+	def player_jukebox(self, host='localhost', port=3000):
+		import json
+		import urllib2
+		try:
+			headers = {'X_REQUESTED_WITH' :'XMLHttpRequest',
+					'ACCEPT': 'application/json, text/javascript, */*; q=0.01',}
+			url = "http://{0}:{1}/playlist/current-track".format(host, port)
+			request = urllib2.Request(url, None, headers)
+			current_track = json.loads(urllib2.urlopen(request).read())
+		except (TypeError, ValueError):
+			return None
+		state = "play" if (current_track["playing"]) else "pause"
+		return {
+				'state': state,
+				'state_symbol': self.STATE_SYMBOLS.get(state),
+				'album': current_track["album"],
+				'artist': current_track["artist"],
+				'title': current_track["title"],
+				'elapsed': self._convert_seconds(current_track["progress"]),
+				'total': self._convert_seconds(current_track["duration"]),
+				}
 now_playing = NowPlayingSegment()
