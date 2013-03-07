@@ -198,6 +198,49 @@ def uptime(format='{days:02d}d {hours:02d}h {minutes:02d}m'):
 	return format.format(days=int(days), hours=hours, minutes=minutes)
 
 
+def _run_cmd(cmd):
+	from subprocess import Popen, PIPE
+	try:
+		p = Popen(cmd, stdout=PIPE)
+		stdout, err = p.communicate()
+	except OSError as e:
+		sys.stderr.write('Could not execute command ({0}): {1}\n'.format(e, cmd))
+		return None
+	return stdout.strip()
+
+
+def battery():
+	if not (_run_cmd(['uname']) == 'Darwin'):
+		return
+	ac = _run_cmd(['pmset', '-g', 'ac']).split('\n')
+	batt = _run_cmd(['pmset', '-g', 'batt']).split('\n')
+
+	import re
+	power_source = re.compile(r'^Currently drawing from \'(.*)\'').match(batt[0]).groups()[0]
+	if len(batt) > 1:
+		battery_details = batt[1].split(';')
+		battery_level = int(re.compile(r'^.*\s(\d+)%').match(battery_details[0]).groups()[0])
+		whole, partial = divmod(battery_level, 25)
+		battery_visual = (u"█" * whole)
+		battery_visual += [u" ",u"▏",u"▎",u"▍",u"▌",u"▋",u"▊",u"▉",u"█"][partial/3]
+		battery_highlight = 'battery' if (battery_level > 25) else 'battery_low'
+		display = []
+		display.append({
+			'contents': u"┃{0}┣ ".format(battery_visual.ljust(4)),
+			'highlight_group': [battery_highlight, 'battery'],
+			'draw_divider': False,
+			})
+		display.append({
+			'contents': '{0}%'.format(battery_level),
+			'highlight_group': ['battery_percentage', 'battery'],
+			'draw_divider': False,
+			'gradient_level': (100 - battery_level),
+			})
+		return display
+	else:
+		return None
+
+
 # Weather condition code descriptions available at
 # http://developer.yahoo.com/weather/#codes
 weather_conditions_codes = (
