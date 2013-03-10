@@ -222,7 +222,7 @@ def battery():
 		battery_level = int(re.compile(r'^.*\s(\d+)%').match(battery_details[0]).groups()[0])
 		whole, partial = divmod(battery_level, 25)
 		battery_visual = (u"█" * whole)
-		battery_visual += [u" ",u"▏",u"▎",u"▍",u"▌",u"▋",u"▊",u"▉",u"█"][partial/3]
+		battery_visual += [u"",u"▏",u"▎",u"▍",u"▌",u"▋",u"▊",u"▉",u"█"][partial/3]
 		battery_highlight = 'battery' if (battery_level > 25) else 'battery_low'
 		display = []
 		display.append({
