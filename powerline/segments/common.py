@@ -226,7 +226,7 @@ def battery():
 		battery_highlight = 'battery' if (battery_level > 25) else 'battery_low'
 		display = []
 		display.append({
-			'contents': u"┃{0}┣ ".format(battery_visual.ljust(4)),
+			'contents': u"▌{0}▐╸ ".format(battery_visual.ljust(4)),
 			'highlight_group': [battery_highlight, 'battery'],
 			'draw_divider': False,
 			})
